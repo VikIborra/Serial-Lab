@@ -48,7 +48,7 @@ namespace Seriallab
             stopbitsConfig.DataSource = new[] { "1", "2", "1.5" };
             flowcontrolConfig.DataSource = new[] { "None", "RTS", "RTS/X", "Xon/Xoff" };
             //portConfig.SelectedIndex = 0;
-            baudrateConfig.SelectedIndex = 5;
+            baudrateConfig.SelectedIndex = 0;
             parityConfig.SelectedIndex = 0;
             databitsConfig.SelectedIndex = 3;
             stopbitsConfig.SelectedIndex = 0;
@@ -60,8 +60,8 @@ namespace Seriallab
             backgroundWorker1.DoWork += new DoWorkEventHandler(update_rxtextarea_event);
             tabControl1.Selected += new TabControlEventHandler(tabControl1_Selecting);
 
-            for (int i = 0; i < 5 && i < 5; i++)
-                graph.Series[i].Points.Add(0);
+            //for (int i = 0; i < 5 && i < 5; i++)
+                //graph.Series[i].Points.Add(0);
 
         }
 
@@ -162,7 +162,7 @@ namespace Seriallab
                             string[] variables = data.Split('\n')[0].Split(',');
                             for (int i = 0; i < variables.Length && i < 5; i++)
                             {
-                                if (double.TryParse(variables[i], out number))
+                                if (double.TryParse(variables[i].Replace('.', ','), out number))
                                 {
                                     if (graph.Series[i].Points.Count > graph_scaler)
                                         graph.Series[i].Points.RemoveAt(0);
@@ -461,11 +461,13 @@ namespace Seriallab
                 graph.SaveImage(saveFileDialog1.FileName, ChartImageFormat.Png);
         }
         /*clear graph*/
-        private void clear_graph_Click(object sender, EventArgs e)
-        {
-            for (int i = 0; i < 5; i++)
-                graph.Series[i].Points.Clear();
-        }
+        private void clear_graph_Click(object sender, EventArgs e) {
+			for (int i = 0; i < 5; i++) {
+				graph.Series[i].Points.Clear();
+				graph.Series[i].IsValueShownAsLabel = true;
+				graph.Series[i].LabelForeColor = Color.Gray;
+			}
+		}
 
         /*Application-----*/
         /*serial port config*/
@@ -503,11 +505,12 @@ namespace Seriallab
         /* tabcontrol*/
         void tabControl1_Selecting(object sender, TabControlEventArgs e)
         {
-            if (tabControl1.SelectedIndex == 2)
-                plotter_flag = true;
-            else
-                plotter_flag = false;
-        }
+			plotter_flag = true;
+			if (tabControl1.SelectedIndex == 2)
+				plotter_flag = true;
+			else
+				plotter_flag = false;
+		}
         /* Search for available serial ports */
         private void portConfig_Click(object sender, EventArgs e)
         {
